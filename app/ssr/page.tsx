@@ -1,5 +1,6 @@
 import React, {Suspense} from 'react'
 import Link from 'next/link'
+import Image from 'next/image';
 import { getAlbums } from '../components/getAlbums';
 
 function Loading() {
@@ -31,12 +32,15 @@ const SSRPage = async () => {
           <div key={album.id} className="border rounded-lg overflow-hidden shadow-lg">
             <div className="h-48 bg-gray-200 relative">
               {album.coverUrl && (
-                <img 
-                  src={album.coverUrl} 
-                  alt={`${album.title} cover`}
-                  className="w-full h-full object-cover"
-                />
-              )}
+                  <Image
+                    src={album.coverUrl}
+                    alt={`${album.title} cover`}
+                    fill // Replaces w-full h-full
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Optional: adjust based on your grid layout
+                    priority={false} // Set to true for above-the-fold images
+                  />
+                )}
             </div>
             <div className="p-4">
               <h2 className="text-xl font-bold">{album.title}</h2>

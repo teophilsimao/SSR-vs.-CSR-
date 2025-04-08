@@ -26,7 +26,7 @@ export async function getAlbums() {
             }
           );
   
-          let coverUrl = {music};
+          let coverUrl = music;
   
           if (!coverRes.ok) {
             return {
@@ -60,7 +60,7 @@ export async function getAlbums() {
             artist: album['artist-credit']?.[0]?.name || 'Unknown Artist',
             date: album.date || 'Unknown Date',
             country: album.country || 'Unknown',
-            coverUrl: {music},
+            coverUrl: '/placeholder-album.jpg',
           };
         }
       })

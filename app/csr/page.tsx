@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getAlbums } from '../components/getAlbums';
 
 const CSRpage = () => {
@@ -41,10 +42,12 @@ const CSRpage = () => {
             <div key={album.id} className="border rounded-lg overflow-hidden shadow-lg">
               <div className="h-48 bg-gray-200 relative">
                 {album.coverUrl && (
-                  <img
+                  <Image
                     src={album.coverUrl}
                     alt={`${album.title} cover`}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    priority={false}
                   />
                 )}
               </div>
