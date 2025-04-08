@@ -5,8 +5,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getAlbums } from '../components/getAlbums';
 
+interface Album {
+  id: string;
+  title: string;
+  artist: string;
+  date: string;
+  country: string;
+  coverUrl: string;
+}
+
 const CSRpage = () => {
-  const [albums, setAlbums] = useState<any[]>([]);
+  const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

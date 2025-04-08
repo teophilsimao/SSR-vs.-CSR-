@@ -1,5 +1,16 @@
 import music from '../../public/music.png'
 
+interface Album {
+    id: string;
+    title: string;
+    date?: string;
+    country?: string;
+    'artist-credit'?: {
+      name?: string;
+    }[];
+  }
+  
+
 export async function getAlbums() {
     const res = await fetch(
       'https://musicbrainz.org/ws/2/release?query=primarytype:album&fmt=json&limit=100',
@@ -16,7 +27,7 @@ export async function getAlbums() {
     const data = await res.json();
   
     const albumsWithDetails = await Promise.all(
-      data.releases.map(async (album: any) => {
+      data.releases.map(async (album: Album) => {
         try {
           const coverRes = await fetch(
             `https://coverartarchive.org/release/${album.id}`,

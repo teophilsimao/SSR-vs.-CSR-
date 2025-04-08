@@ -3,6 +3,15 @@ import Link from 'next/link'
 import Image from 'next/image';
 import { getAlbums } from '../components/getAlbums';
 
+interface Album {
+  id: string;
+  title: string;
+  artist: string;
+  date: string;
+  country: string;
+  coverUrl: string;
+}
+
 function Loading() {
   return (
     <div className="container mx-auto p-4">
@@ -28,7 +37,7 @@ const SSRPage = async () => {
       </Link>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        {albums.map((album: any) => (
+        {albums.map((album: Album) => (
           <div key={album.id} className="border rounded-lg overflow-hidden shadow-lg">
             <div className="h-48 bg-gray-200 relative">
               {album.coverUrl && (
