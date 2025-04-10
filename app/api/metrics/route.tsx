@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
             await fs.access(metricsDir)
         } catch (e) {
             await fs.mkdir(metricsDir, { recursive: true })
+            console.log(e)
         }
 
         const jsonPath = path.join(metricsDir, 'performance_metrics.json')
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
             const fileData = await fs.readFile(jsonPath, 'utf-8')
             existingMetrics = JSON.parse(fileData)
         } catch (e) {
-
+            console.log(e)
         }
         existingMetrics.push(metrics)
         await fs.writeFile(jsonPath, JSON.stringify(existingMetrics, null, 2));
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
             await fs.access(csvPath)
             csvExits = true
         }catch (e){
-
+            console.log(e)
         }
 
         let csvData = '';

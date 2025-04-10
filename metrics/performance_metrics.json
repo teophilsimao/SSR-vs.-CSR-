@@ -475,5 +475,27 @@
     "lcp": 4504,
     "inp": null,
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "4affc2e0-90f1-4e33-9c38-b85489941a71",
+    "timeStamp": 1744313734773,
+    "pageType": "SSR",
+    "ttfb": 1617,
+    "lcp": 1903,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0",
+    "connectionType": null,
+    "deviceMemory": null
+  },
+  {
+    "id": "f2f7d9a4-0399-4dd6-8ef9-c74c4e5aa8e2",
+    "timeStamp": 1744313743488,
+    "pageType": "CSR",
+    "ttfb": 1617,
+    "lcp": 1903,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0",
+    "connectionType": null,
+    "deviceMemory": null
   }
 ]

@@ -3,112 +3,131 @@
 import { useEffect } from "react";
 
 interface MetricsScriptProps {
-    pageType: 'SSR' | 'CSR';
+  pageType: 'SSR' | 'CSR';
+}
+
+interface CustomNavigator extends Navigator {
+  connection?: {
+    effectiveType?: string;
+  };
+  deviceMemory?: number;
+}
+
+interface PerformanceEventTiming extends PerformanceEntry {
+  processingStart: number;
+  processingEnd: number;
+  interactionId: number;
+  duration: number;
+  name: string;
 }
 
 export default function MetricsScript({ pageType }: MetricsScriptProps) {
-    useEffect(() => {
-        // Function to collect performance metrics
-        const collectPerformanceMetrics = async () => {
-            const metrics = {
-                id: crypto.randomUUID(),
-                timeStamp: Date.now(),
-                pageType,
-                ttfb: null as number | null,
-                lcp: null as number | null,
-                inp: null as number | null,
-                userAgent: navigator.userAgent,
-                connectionType: (navigator as any).connection?.effectiveType,
-                deviceMemory: (navigator as any).deviceMemory,
-            };
+  useEffect(() => {
+    const collectPerformanceMetrics = async () => {
+      const nav = navigator as CustomNavigator;
 
-            // Collect TTFB
-            const navigationEntries = performance.getEntriesByType('navigation');
-            if (navigationEntries.length > 0) {
-                const navigationEntry = navigationEntries[0] as PerformanceNavigationTiming;
-                metrics.ttfb = navigationEntry.responseStart - navigationEntry.requestStart;
+      const metrics = {
+        id: crypto.randomUUID(),
+        timeStamp: Date.now(),
+        pageType,
+        ttfb: null as number | null,
+        lcp: null as number | null,
+        inp: null as number | null,
+        userAgent: nav.userAgent,
+        connectionType: nav.connection?.effectiveType ?? null,
+        deviceMemory: nav.deviceMemory ?? null,
+      };
+
+      // TTFB
+      const navigationEntries = performance.getEntriesByType('navigation');
+      if (navigationEntries.length > 0) {
+        const navigationEntry = navigationEntries[0] as PerformanceNavigationTiming;
+        metrics.ttfb = navigationEntry.responseStart - navigationEntry.requestStart;
+      }
+
+      // LCP Promise
+      const lcpPromise = new Promise<number | null>((resolve) => {
+        let lcpValue: number | null = null;
+
+        try {
+          const lcpObserver = new PerformanceObserver((entryList) => {
+            const entries = entryList.getEntries();
+            const lastEntry = entries[entries.length - 1];
+            if (lastEntry) {
+              lcpValue = lastEntry.startTime;
             }
+          });
 
-            // Create LCP Promise
-            const lcpPromise = new Promise<number | null>((resolve) => {
-                let lcpValue: number | null = null;
+          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
 
-                try{
-                    const lcpObserve = new PerformanceObserver((entryList) => {
-                        const entries = entryList.getEntries();
-                        const lastEntry = entries[entries.length - 1]
-                        if (lastEntry) {
-                            lcpValue = lastEntry.startTime;
-                        }
-                    });
+          setTimeout(() => {
+            lcpObserver.disconnect();
+            resolve(lcpValue);
+          }, 3000);
+        } catch (e) {
+          console.error('LCP observe error:', e);
+          resolve(null);
+        }
+      });
 
-                    lcpObserve.observe({ type: 'largest-contentful-paint', buffered: true});
+      // INP Promise
+      const inpPromise = new Promise<number | null>((resolve) => {
+        let inpValue: number | null = null;
 
-                    setTimeout(() => {
-                        lcpObserve.disconnect();
-                        resolve(lcpValue);
-                    }, 3000);
-                } catch (e) {
-                    console.error('LCP observe error:', e);
-                    resolve(null);
-                }
+        try {
+          const inpObserver = new PerformanceObserver((entryList) => {
+            const entries = entryList.getEntries();
+
+            entries.forEach((entry) => {
+              const eventEntry = entry as PerformanceEventTiming;
+
+              if (
+                typeof eventEntry.interactionId === 'number' &&
+                (inpValue === null || eventEntry.duration > inpValue)
+              ) {
+                inpValue = eventEntry.duration;
+              }
             });
+          });
 
-            // Create INP Promise
-            const inpPromise = new Promise<number | null>((resolve) => {
-                let inpValue: number | null = null;
+          inpObserver.observe({ type: 'event', buffered: true });
 
-                try {
-                    const inpObserver = new PerformanceObserver((entryList) => {
-                        const entries = entryList.getEntries();
-                        console.log('INP entries:', entries);
-                        entries.forEach((entry) => {
-                            if (!inpValue || (entry as any).interactionId && (entry as any).duration > inpValue) {
-                                inpValue = (entry as any).duration;
-                            }
-                        });
-                    });
+          setTimeout(() => {
+            inpObserver.disconnect();
+            resolve(inpValue);
+          }, 3000);
+        } catch (e) {
+          console.error('INP observer error:', e);
+          resolve(null);
+        }
+      });
 
-                    inpObserver.observe({ 
-                        type: 'event', 
-                        buffered: true,
-                    });
+      metrics.lcp = await lcpPromise;
+      metrics.inp = await inpPromise;
 
-                    setTimeout(() => {
-                        inpObserver.disconnect();
-                        resolve(inpValue)
-                    }, 3000);
-                } catch (e){
-                    console.error('INP observer error', e);
-                    resolve(null)
-                }
-            });
+      try {
+        const response = await fetch('/api/metrics', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(metrics),
+        });
 
-            metrics.lcp = await lcpPromise;
-            metrics.inp = await inpPromise;
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
 
-            try {
-                const response = await fetch('/api/metrics', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(metrics)
-                });
+        console.log(`${pageType} metrics collected and saved:`, metrics);
+      } catch (error) {
+        console.error('Error saving metrics:', error);
+      }
+    };
 
-                if (!response.ok) {
-                    throw new Error(response.statusText)
-                }
-                console.log(`${pageType} metrics collected and saved:`, metrics);
-            } catch (error) {
-                console.error('Error saving metrics:', error);
-            }
-        };
+    const timer = setTimeout(() => collectPerformanceMetrics(), 100);
 
-        const timer = setTimeout(() => collectPerformanceMetrics(), 100);
+    return () => clearTimeout(timer);
+  }, [pageType]);
 
-        return () => clearTimeout(timer)
-    }, [pageType])
-
-    return null
+  return null;
 }

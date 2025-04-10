@@ -1,4 +1,4 @@
-import React, {Suspense} from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { getAlbums } from '../components/getAlbums';
 import MetricsScript from '../components/MetricsScript';
