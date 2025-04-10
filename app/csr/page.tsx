@@ -2,32 +2,22 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { getAlbums } from '../components/getAlbums';
-
-interface Album {
-  id: string;
-  title: string;
-  artist: string;
-  date: string;
-  country: string;
-  coverUrl: string;
-}
+import MetricsScript from '../components/MetricsScript';
+import ClientAlbumCard from '../components/ClientAlbumCard';
+import { Album } from '../components/AlbumInterface';
 
 const CSRpage = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
         const albumsData = await getAlbums();
         setAlbums(albumsData);
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching albums:', error);
         setAlbums([]);
-        setLoading(false);
       }
     }
 
@@ -41,35 +31,13 @@ const CSRpage = () => {
         View SSR Version
       </Link>
 
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <p className="text-xl">Loading albums...</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {albums.map((album) => (
-            <div key={album.id} className="border rounded-lg overflow-hidden shadow-lg">
-              <div className="h-48 bg-gray-200 relative">
-                {album.coverUrl && (
-                  <Image
-                    src={album.coverUrl}
-                    alt={`${album.title} cover`}
-                    fill
-                    className="object-cover"
-                    priority={false}
-                  />
-                )}
-              </div>
-              <div className="p-4">
-                <h2 className="text-xl font-bold">{album.title}</h2>
-                <p className="text-gray-700">Artist: {album.artist}</p>
-                <p className="text-gray-600">Released: {album.date}</p>
-                <p className="text-gray-600">Country: {album.country}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        {albums.map((album: Album) => (
+          <ClientAlbumCard key={album.id} album={album}/>
+        ))}
+      </div>
+
+      <MetricsScript pageType='CSR' />
     </div>
   );
 };

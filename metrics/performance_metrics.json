@@ -1,0 +1,479 @@
+[
+  {
+    "id": "075665c7-4878-437b-adfe-1b183af41e1f",
+    "timeStamp": 1744303676840,
+    "pageType": "SSR",
+    "ttfb": 26,
+    "lcp": 125,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "cb8c45c3-4da0-4141-a1f1-d8e92d6e98c4",
+    "timeStamp": 1744304023030,
+    "pageType": "SSR",
+    "ttfb": 70,
+    "lcp": 247,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "8b89b530-6164-4d42-8b48-06b9ceb6d558",
+    "timeStamp": 1744304154861,
+    "pageType": "SSR",
+    "ttfb": 84,
+    "lcp": 4418,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "4a0ce3d4-31ac-4e26-9dda-15dd6ef7c6cc",
+    "timeStamp": 1744304306012,
+    "pageType": "SSR",
+    "ttfb": 81,
+    "lcp": 3629,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "e410a58a-b02a-4b66-a81c-8de7f21f69e9",
+    "timeStamp": 1744306317458,
+    "pageType": "SSR",
+    "ttfb": 81,
+    "lcp": 236,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "0c0d9fe7-8996-4d83-9a45-e6358bceb41f",
+    "timeStamp": 1744306573934,
+    "pageType": "SSR",
+    "ttfb": 99,
+    "lcp": 286,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "4270ef39-a7ec-4486-86d2-69d27831b968",
+    "timeStamp": 1744306832247,
+    "pageType": "SSR",
+    "ttfb": 84,
+    "lcp": 241,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "188eaa7c-bd25-4234-a252-258420d72b52",
+    "timeStamp": 1744306863467,
+    "pageType": "SSR",
+    "ttfb": 81,
+    "lcp": 6036,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "a2b799b3-43c1-4a78-9c43-a8236028d261",
+    "timeStamp": 1744307198338,
+    "pageType": "SSR",
+    "ttfb": 77,
+    "lcp": 4130,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "99ec0e31-7007-442f-bdab-ea4a7ef5197b",
+    "timeStamp": 1744307333329,
+    "pageType": "SSR",
+    "ttfb": 73,
+    "lcp": 3889,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "faddee25-b231-4db8-a4f4-afcd7e50cea7",
+    "timeStamp": 1744307418963,
+    "pageType": "SSR",
+    "ttfb": 80,
+    "lcp": 6957,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "1c5ea187-8dcf-41ef-a15a-7a6ceeb7dba5",
+    "timeStamp": 1744307570204,
+    "pageType": "SSR",
+    "ttfb": 77,
+    "lcp": 3882,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "b8472671-1539-440d-8bbb-335c06fed41d",
+    "timeStamp": 1744308095889,
+    "pageType": "SSR",
+    "ttfb": 81,
+    "lcp": 4961,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "31eb81e7-53fb-404d-a2e1-5e7ea79dd915",
+    "timeStamp": 1744308743439,
+    "pageType": "SSR",
+    "ttfb": 85,
+    "lcp": 4075,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "caad6c9c-fa50-4c19-b547-3501e21f9383",
+    "timeStamp": 1744309078122,
+    "pageType": "SSR",
+    "ttfb": 76,
+    "lcp": 11042,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "a89a446b-3ddc-482c-ae93-ad0487020b65",
+    "timeStamp": 1744309461897,
+    "pageType": "SSR",
+    "ttfb": 63,
+    "lcp": 4066,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "578e03c9-2882-49d4-83cd-1f36ab4f273d",
+    "timeStamp": 1744309521640,
+    "pageType": "SSR",
+    "ttfb": 157,
+    "lcp": 4584,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "e2cc1459-c25e-4de9-9f02-634469f3aa5e",
+    "timeStamp": 1744309575410,
+    "pageType": "SSR",
+    "ttfb": 2075,
+    "lcp": 2281,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "595076b1-50dd-4b83-b4ee-31f13f2b5a4c",
+    "timeStamp": 1744309585904,
+    "pageType": "SSR",
+    "ttfb": 111,
+    "lcp": 6969,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "299160fd-72ce-403c-b702-6e86bc8497ab",
+    "timeStamp": 1744309712669,
+    "pageType": "SSR",
+    "ttfb": 196,
+    "lcp": 4926,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "33f16a35-f599-4f51-a85b-d0c8e27fb0f1",
+    "timeStamp": 1744309722624,
+    "pageType": "SSR",
+    "ttfb": 82,
+    "lcp": 4544,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "0fa760d8-1585-49cc-87bc-1eed49b90dc6",
+    "timeStamp": 1744310052091,
+    "pageType": "CSR",
+    "ttfb": 376,
+    "lcp": 508,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "8cb41e3f-0324-4a5a-8555-09ec2478eb52",
+    "timeStamp": 1744310194328,
+    "pageType": "SSR",
+    "ttfb": 376,
+    "lcp": 508,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "89493bff-e451-43e9-b657-fcec848f3cdb",
+    "timeStamp": 1744310204131,
+    "pageType": "SSR",
+    "ttfb": 90,
+    "lcp": 4055,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "2847c9a0-11d7-4345-85bc-518e5991e701",
+    "timeStamp": 1744310225314,
+    "pageType": "SSR",
+    "ttfb": 63,
+    "lcp": 4891,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "63782536-61ca-4c82-a356-53734c6b945c",
+    "timeStamp": 1744310285339,
+    "pageType": "CSR",
+    "ttfb": 63,
+    "lcp": 4891,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "c0a95797-b3c3-41be-bdb5-bbb1663b2b4b",
+    "timeStamp": 1744310302531,
+    "pageType": "CSR",
+    "ttfb": 39,
+    "lcp": 156,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "1db68851-2f6c-41e8-96ce-1ac3b7bdd166",
+    "timeStamp": 1744310323518,
+    "pageType": "SSR",
+    "ttfb": 39,
+    "lcp": 156,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "1169c7d1-19c4-475c-a02b-f6115b95354a",
+    "timeStamp": 1744310341747,
+    "pageType": "SSR",
+    "ttfb": 31,
+    "lcp": 4278,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "f7f47e87-ac6f-4c4a-b811-5d986f2f48b2",
+    "timeStamp": 1744310351516,
+    "pageType": "CSR",
+    "ttfb": 31,
+    "lcp": 4278,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "dcdf29bf-c419-4a2e-a42d-6b13c5add500",
+    "timeStamp": 1744310358245,
+    "pageType": "CSR",
+    "ttfb": 29,
+    "lcp": 299,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "d3d369bd-7f64-41f1-abc0-1d21ed307dc8",
+    "timeStamp": 1744310740379,
+    "pageType": "CSR",
+    "ttfb": 98,
+    "lcp": 218,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "f7c0cc5a-d97e-47db-9910-86ac4f9944cc",
+    "timeStamp": 1744310764220,
+    "pageType": "SSR",
+    "ttfb": 98,
+    "lcp": 8233,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "058d6010-6344-4a50-8b4f-d385c4842d83",
+    "timeStamp": 1744310931824,
+    "pageType": "CSR",
+    "ttfb": 98,
+    "lcp": 8233,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "9ff9e17c-2508-40e5-8a8c-5c7c38f71563",
+    "timeStamp": 1744310951048,
+    "pageType": "SSR",
+    "ttfb": 98,
+    "lcp": 8233,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "736a38e2-3c17-4804-8554-377be423da76",
+    "timeStamp": 1744311372852,
+    "pageType": "CSR",
+    "ttfb": 98,
+    "lcp": 8233,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "07b91875-b6fb-4133-8adf-89c80e1da464",
+    "timeStamp": 1744311396796,
+    "pageType": "SSR",
+    "ttfb": 386,
+    "lcp": 533,
+    "inp": 132,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "4403ccb4-16c5-4eac-b335-27e4c373c41c",
+    "timeStamp": 1744311427044,
+    "pageType": "SSR",
+    "ttfb": 31,
+    "lcp": 6878,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "a1660c07-bf3f-402d-8166-1d27ab95a7af",
+    "timeStamp": 1744311607982,
+    "pageType": "SSR",
+    "ttfb": 31,
+    "lcp": 6878,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "0b917993-83c9-47f0-9881-f1acd62feb8d",
+    "timeStamp": 1744311627569,
+    "pageType": "SSR",
+    "ttfb": 8267,
+    "lcp": null,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "bb6c44f6-1ac3-442a-a11d-022646fdc49c",
+    "timeStamp": 1744311842107,
+    "pageType": "SSR",
+    "ttfb": 6839,
+    "lcp": 7082,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "32cc3cef-0f65-4a06-af2a-0d10a44e7f39",
+    "timeStamp": 1744311928696,
+    "pageType": "CSR",
+    "ttfb": 152,
+    "lcp": 650,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "5f7902ac-0455-402e-9201-0fa5c8faffac",
+    "timeStamp": 1744311939029,
+    "pageType": "CSR",
+    "ttfb": 132,
+    "lcp": 283,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "c1599425-e06f-4838-8388-c9c1d56d9cd3",
+    "timeStamp": 1744311956250,
+    "pageType": "CSR",
+    "ttfb": 34,
+    "lcp": 192,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "1b46c638-f9bb-471b-9374-44a62e2c48d9",
+    "timeStamp": 1744312091672,
+    "pageType": "CSR",
+    "ttfb": 34,
+    "lcp": 4101,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "cb31ec6c-bed2-4d58-a8ad-3c230622f671",
+    "timeStamp": 1744312116038,
+    "pageType": "SSR",
+    "ttfb": 34,
+    "lcp": 4101,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "27375a2a-2262-49b0-ac52-fe3eef58347a",
+    "timeStamp": 1744312126019,
+    "pageType": "SSR",
+    "ttfb": 4755,
+    "lcp": 4985,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "11c71428-2f2b-423c-860e-3b1206b2af06",
+    "timeStamp": 1744312135566,
+    "pageType": "CSR",
+    "ttfb": 4755,
+    "lcp": 4985,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "4aa2bea4-1089-4074-bc7e-57ee2578406a",
+    "timeStamp": 1744312143298,
+    "pageType": "CSR",
+    "ttfb": 38,
+    "lcp": 287,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "0f645fe9-b3b8-4fed-a24d-965e03d080f4",
+    "timeStamp": 1744312585798,
+    "pageType": "SSR",
+    "ttfb": 38,
+    "lcp": 10805,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "8649e9ab-1e60-426e-95ab-402b195da731",
+    "timeStamp": 1744312594558,
+    "pageType": "CSR",
+    "ttfb": 38,
+    "lcp": 10805,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "2c2f4a00-198f-40c8-ae3f-8c056964c8f4",
+    "timeStamp": 1744312631409,
+    "pageType": "SSR",
+    "ttfb": 38,
+    "lcp": 10805,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  },
+  {
+    "id": "feb0d3d4-c9c0-48b0-ae4c-a05cff62387f",
+    "timeStamp": 1744312639410,
+    "pageType": "SSR",
+    "ttfb": 4328,
+    "lcp": 4504,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0"
+  }
+]
