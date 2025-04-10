@@ -1,6 +1,11 @@
 'use client';
 
 import { useEffect } from "react";
+import { v4 as uuidv4 } from 'uuid';
+
+const safeUUID = () => {
+  return uuidv4();  // Generates a UUID
+};
 
 interface MetricsScriptProps {
   pageType: 'SSR' | 'CSR';
@@ -27,7 +32,7 @@ export default function MetricsScript({ pageType }: MetricsScriptProps) {
       const nav = navigator as CustomNavigator;
 
       const metrics = {
-        id: crypto.randomUUID(),
+        id: safeUUID(),
         timeStamp: Date.now(),
         pageType,
         ttfb: null as number | null,
