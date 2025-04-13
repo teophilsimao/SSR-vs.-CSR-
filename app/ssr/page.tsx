@@ -1,7 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
 import { getAlbums } from '../components/getAlbums';
-import MetricsScript from '../components/MetricsScript';
 import ServerAlbumCard from '../components/ServerAlbumCard';
 import { Album } from '../components/AlbumInterface';
 
@@ -20,7 +19,6 @@ const SSRPage = async () => {
           <ServerAlbumCard key={album.id} album={album}/>
         ))}
       </div>
-      <MetricsScript pageType='SSR' />
     </div>
   );
 }

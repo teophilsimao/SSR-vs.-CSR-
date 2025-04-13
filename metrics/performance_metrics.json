@@ -530,5 +530,38 @@
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_2_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/135.0.7049.53 Mobile/15E148 Safari/604.1",
     "connectionType": null,
     "deviceMemory": null
+  },
+  {
+    "id": "9eee4254-d788-416f-a3ab-f35770abe5e3",
+    "timeStamp": 1744363225190,
+    "pageType": "SSR",
+    "ttfb": 1234,
+    "lcp": 1444,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0",
+    "connectionType": null,
+    "deviceMemory": null
+  },
+  {
+    "id": "efc11fba-6d6a-4321-981f-1192cd12c430",
+    "timeStamp": 1744363231556,
+    "pageType": "CSR",
+    "ttfb": 1234,
+    "lcp": 1444,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0",
+    "connectionType": null,
+    "deviceMemory": null
+  },
+  {
+    "id": "e20b0df6-c3fb-4c0f-88cc-c2607e7f61e0",
+    "timeStamp": 1744363258322,
+    "pageType": "SSR",
+    "ttfb": 1234,
+    "lcp": 1444,
+    "inp": null,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0",
+    "connectionType": null,
+    "deviceMemory": null
   }
 ]

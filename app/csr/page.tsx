@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getAlbums } from '../components/getAlbums';
-import MetricsScript from '../components/MetricsScript';
 import ClientAlbumCard from '../components/ClientAlbumCard';
 import { Album } from '../components/AlbumInterface';
 
@@ -36,8 +35,6 @@ const CSRpage = () => {
           <ClientAlbumCard key={album.id} album={album}/>
         ))}
       </div>
-
-      <MetricsScript pageType='CSR' />
     </div>
   );
 };
