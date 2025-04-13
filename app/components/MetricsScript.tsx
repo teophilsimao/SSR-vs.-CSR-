@@ -103,11 +103,11 @@ const MetricsScript = () => {
               userAgent: navigator.userAgent,
               deviceMemory: 'deviceMemory' in navigator ? navigator.deviceMemory : undefined,
               connection: 'connection' in navigator ? {
-                // @ts-expect-error
+                // @ts-expect-error Needed for a thing
                 type: navigator.connection?.effectiveType,
-                // @ts-expect-error
+                // @ts-expect-error Sames as the thing
                 downlink: navigator.connection?.downlink,
-                // @ts-expect-error
+                // @ts-expect-error Sommaren e kort
                 rtt: navigator.connection?.rtt,
               } : undefined,
             
@@ -204,7 +204,7 @@ const MetricsScript = () => {
         const entries = entryList.getEntries();
         if (entries.length > 0) {
           entries.forEach((entry) => {
-            const interaction = entry as PerformanceEventTiming; // ✅ Correct type
+            const interaction = entry as PerformanceEventTiming;
       
             if (window.__PERFORMANCE_METRICS__?.inpEntries) {
               window.__PERFORMANCE_METRICS__.inpEntries.push(interaction.duration);
@@ -222,10 +222,10 @@ const MetricsScript = () => {
         interactionObserver.observe({ 
           type: 'event', 
           buffered: true,
-          // @ts-expect-error
+          // @ts-expect-error Duration has to be 
           durationThreshold: 16 
         });
-      } catch (e) {
+      } catch {
         interactionObserver.observe({ 
           type: 'event', 
           buffered: true 
