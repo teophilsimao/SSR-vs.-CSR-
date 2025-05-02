@@ -1,312 +1,230 @@
 'use client';
 
 import { useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { onCLS, onFCP, onFID, onINP, onLCP, onTTFB } from 'web-vitals';
 
-const MetricsScript = () => {
-  const pathname = usePathname();
-  const router = useRouter();
-
-  // Determine page type based on pathname
-  const getPageType = (path: string) => {
-    if (path.includes('/ssr')) return 'SSR';
-    if (path.includes('/csr')) return 'CSR';
-    return 'Other';
+interface NavigatorConnection extends Navigator {
+  connection?: {
+    effectiveType: string;
+    downlink?: number;
+    rtt?: number;
+    saveData?: boolean;
   };
-
-  const pageType = getPageType(pathname);
-
-  // Force a hard refresh when navigating between SSR and CSR pages
-  const handleNavigation = (href: string) => {
-    const currentType = getPageType(pathname);
-    const targetType = getPageType(href);
-    
-    // If changing between SSR and CSR types, force a full page load
-    if (currentType !== targetType && (currentType !== 'Other' && targetType !== 'Other')) {
-      window.location.href = href; // Force a full page refresh
-    } else {
-      router.push(href); // Use Next.js client-side navigation
-    }
-  };
-
-  useEffect(() => {
-    // Only collect metrics for SSR and CSR pages
-    if (pageType === 'Other') return;
-
-    // Ensure this only runs in the browser
-    if (typeof window === 'undefined') return;
-
-    // Reset metrics for each navigation
-    window.__PERFORMANCE_METRICS__ = {
-      lastNavigationTime: Date.now(),
-      lastPathname: pathname,
-      inpEntries: [] // Array to store all INP entries for percentile calculation
-    };
-    
-    // Function to collect and send metrics
-    const collectAndSendMetrics = async () => {
-      // Wait for the page to be fully loaded and metrics to be available
-      if (document.readyState !== 'complete') {
-        window.addEventListener('load', () => setTimeout(collectAndSendMetrics, 100));
-        return;
-      }
-
-      try {
-        // Wait longer after load to ensure all metrics have been calculated
-        // especially for LCP which can register late
-        setTimeout(async () => {
-          // Get basic navigation timing data
-          const navigationEntries = performance.getEntriesByType('navigation');
-          const navigation = navigationEntries.length > 0 
-            ? navigationEntries[0] as PerformanceNavigationTiming 
-            : null;
-          
-          // Get paint timing metrics
-          const paintMetrics = performance.getEntriesByType('paint');
-          const firstPaint = paintMetrics.find(entry => entry.name === 'first-paint')?.startTime || null;
-          const firstContentfulPaint = paintMetrics.find(entry => entry.name === 'first-contentful-paint')?.startTime || null;
-          
-          // Get values from our global storage
-          const metricsStore = window.__PERFORMANCE_METRICS__ || {};
-          
-          // Get Time to First Byte (only if navigation data is available)
-          const ttfb = navigation ? navigation.responseStart - navigation.requestStart : null;
-          
-          // Calculate INP as 75th percentile if we have enough entries
-          let interactionToNextPaint = null;
-          if (metricsStore.inpEntries && metricsStore.inpEntries.length > 0) {
-            // Sort entries by duration
-            const sortedEntries = [...metricsStore.inpEntries].sort((a, b) => a - b);
-            // Get the 75th percentile
-            const idx = Math.floor(sortedEntries.length * 0.75);
-            interactionToNextPaint = sortedEntries[idx];
-          } else {
-            interactionToNextPaint = metricsStore.inp || null;
-          }
-          
-          // Create the metrics object
-          const metrics = {
-            pageURL: window.location.href,
-            pathname,
-            pageType,
-            timestamp: new Date().toISOString(),
-            ttfb,
-            domLoad: navigation ? navigation.domContentLoadedEventEnd : null,
-            windowLoad: navigation ? navigation.loadEventEnd : null,
-            firstPaint,
-            firstContentfulPaint,
-            largestContentfulPaint: metricsStore.lcp || null,
-            interactionToNextPaint,
-            firstInputDelay: metricsStore.fid || null,
-            navigationType: navigation ? navigation.type : 'unknown',
-            deviceInfo: {
-              userAgent: navigator.userAgent,
-              deviceMemory: 'deviceMemory' in navigator ? navigator.deviceMemory : undefined,
-              connection: 'connection' in navigator ? {
-                // @ts-expect-error Needed for a thing
-                type: navigator.connection?.effectiveType,
-                // @ts-expect-error Sames as the thing
-                downlink: navigator.connection?.downlink,
-                // @ts-expect-error Sommaren e kort
-                rtt: navigator.connection?.rtt,
-              } : undefined,
-            
-              viewport: {
-                width: window.innerWidth,
-                height: window.innerHeight
-              }
-            }
-            
-          };
-
-          // Send metrics to the API
-          const response = await fetch('/api/metrics', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(metrics),
-          });
-
-          if (!response.ok) {
-            throw new Error(`Failed to send metrics: ${response.status}`);
-          }
-
-          console.log('Performance metrics sent successfully for', pageType);
-        }, 3000); // Wait 3 seconds after load to collect final metrics (increased from 1s)
-      } catch (error) {
-        console.error('Error sending performance metrics:', error);
-      }
-    };
-
-    // Set up observers
-    setupPerformanceObservers();
-    
-    // Call function to collect metrics
-    collectAndSendMetrics();
-    
-    // Intercept all link clicks to force refresh when necessary
-    const interceptLinks = () => {
-      document.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        const link = target.closest('a');
-        
-        if (link && link.getAttribute('href')) {
-          const href = link.getAttribute('href');
-          if (href && !href.startsWith('http') && !href.startsWith('#')) {
-            e.preventDefault();
-            handleNavigation(href);
-          }
-        }
-      });
-    };
-    
-    interceptLinks();
-    
-    // Cleanup function
-    return () => {
-      document.removeEventListener('click', interceptLinks);
-    };
-    
-  }, [pathname, pageType, router]);
-
-  // Set up performance observers
-  const setupPerformanceObservers = () => {
-    if (!('PerformanceObserver' in window)) return;
-    
-    // Initialize metrics storage if needed
-    if (!window.__PERFORMANCE_METRICS__) {
-      window.__PERFORMANCE_METRICS__ = {
-        inpEntries: []
-      };
-    }
-
-    // Observe LCP - Take the last entry as the final LCP value
-    try {
-      const lcpObserver = new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries();
-        if (entries.length > 0) {
-          const lastEntry = entries[entries.length - 1];
-          // Store LCP value in our global store
-          if (window.__PERFORMANCE_METRICS__) {
-            window.__PERFORMANCE_METRICS__.lcp = lastEntry.startTime;
-          }
-        }
-      });
-      lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-    } catch (e) {
-      console.warn('LCP observation not supported', e);
-    }
-
-    // Observe INP/interaction metrics - Store all entries for percentile calculation
-    try {
-      const interactionObserver = new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries();
-        if (entries.length > 0) {
-          entries.forEach((entry) => {
-            const interaction = entry as PerformanceEventTiming;
-      
-            if (window.__PERFORMANCE_METRICS__?.inpEntries) {
-              window.__PERFORMANCE_METRICS__.inpEntries.push(interaction.duration);
-            }
-      
-            if (window.__PERFORMANCE_METRICS__) {
-              window.__PERFORMANCE_METRICS__.inp = interaction.duration;
-            }
-          });
-        }
-      });
-      
-      // Type-safe observer configuration
-      try {
-        interactionObserver.observe({ 
-          type: 'event', 
-          buffered: true,
-          // @ts-expect-error Duration has to be 
-          durationThreshold: 16 
-        });
-      } catch {
-        interactionObserver.observe({ 
-          type: 'event', 
-          buffered: true 
-        });
-      }
-    } catch (e) {
-      console.warn('Interaction observation not supported', e);
-    }
-
-    // Observe FID
-    try {
-      const fidObserver = new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries();
-        if (entries.length > 0) {
-          const entry = entries[0] as PerformanceEventTiming;
-          const delay = entry.processingStart - entry.startTime;
-          
-          // Store the FID value
-          if (window.__PERFORMANCE_METRICS__) {
-            window.__PERFORMANCE_METRICS__.fid = delay;
-          }
-        }
-      });
-      fidObserver.observe({ type: 'first-input', buffered: true });
-    } catch (e) {
-      console.warn('FID observation not supported', e);
-    }
-  };
-
-  // Custom navigation component
-  return (
-    <div className="metrics-script-navigation" style={{ display: 'none' }}>
-      {/* This component doesn't render anything visible but adds navigation handlers */}
-    </div>
-  );
-};
-
-// Export a custom link component that forces full page loads between SSR/CSR
-export const MetricsLink = ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => {
-  const pathname = usePathname();
-  
-  const getPageType = (path: string) => {
-    if (path.includes('/ssr')) return 'SSR';
-    if (path.includes('/csr')) return 'CSR';
-    return 'Other';
-  };
-  
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const currentType = getPageType(pathname);
-    const targetType = getPageType(href);
-    
-    // If changing between SSR and CSR types, let the default link behavior happen (full page load)
-    if (currentType !== targetType && (currentType !== 'Other' && targetType !== 'Other')) {
-      // Don't prevent default - allow normal link behavior for a full page refresh
-      return;
-    } else {
-      // For same type navigation, use Next.js client-side routing
-      e.preventDefault();
-      window.location.href = href;
-    }
-  };
-  
-  return (
-    <a href={href} onClick={handleClick} {...props}>
-      {children}
-    </a>
-  );
-};
-
-// Required for TypeScript
-declare global {
-  interface Window {
-    __PERFORMANCE_METRICS__?: {
-      lcp?: number;
-      inp?: number;
-      fid?: number;
-      lastNavigationTime?: number;
-      lastPathname?: string;
-      inpEntries?: number[];
-    };
-  }
 }
 
-export default MetricsScript;
+// Define a comprehensive interface for device info
+interface DeviceInfo {
+  userAgent: string;
+  screenWidth: number;
+  screenHeight: number;
+  devicePixelRatio: number;
+  connectionType: string;
+  language: string;
+}
+
+// Define a comprehensive interface for all metrics
+interface MetricsData {
+  pageURL: string;
+  pathname: string;
+  pageType: string;
+  deviceInfo: DeviceInfo;
+  timestamp: string;
+  ttfb?: number;
+  lcp?: number;
+  lcp_fallback?: number;
+  fcp?: number;
+  cls?: number;
+  fid?: number;
+  inp?: number;
+  load?: number;
+  incomplete?: boolean;
+  browserName?: string;
+  browserVersion?: string;
+  ttfb_error?: string;
+  lcp_error?: string;
+  fcp_error?: string;
+  cls_error?: string;
+  fid_error?: string;
+  inp_error?: string;
+  [key: string]: any; 
+}
+
+export default function MetricsScript() {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // Add click event listeners to force full page reloads
+    const setupLinkHandlers = () => {
+      // Find all links in the document
+      document.querySelectorAll('a').forEach(link => {
+        // Only apply to internal links (same domain)
+        if (link.hostname === window.location.hostname) {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Force a full page reload instead of client-side navigation
+            window.location.href = link.href;
+          });
+        }
+      });
+    };
+    
+    // Setup link handlers once DOM is loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupLinkHandlers);
+    } else {
+      setupLinkHandlers();
+    }
+
+    // Function to collect device information
+    const getDeviceInfo = (): DeviceInfo => {
+      const navigatorWithConnection = navigator as NavigatorConnection;
+      return {
+        userAgent: navigator.userAgent,
+        screenWidth: window.screen.width,
+        screenHeight: window.screen.height,
+        devicePixelRatio: window.devicePixelRatio,
+        connectionType: navigatorWithConnection.connection?.effectiveType || 'unknown',
+        language: navigator.language,
+      };
+    };
+
+    // Function to detect browser
+    const detectBrowser = (): { name: string; version: string } => {
+      const userAgent = navigator.userAgent;
+      let browserName = "Unknown";
+      let browserVersion = "Unknown";
+      
+      // Firefox
+      if (userAgent.match(/firefox|fxios/i)) {
+        browserName = "Firefox";
+        browserVersion = userAgent.match(/firefox\/(\d+(\.\d+)?)/i)?.[1] || "Unknown";
+      } 
+      // Safari
+      else if (userAgent.match(/safari/i) && !userAgent.match(/chrome|chromium|edg/i)) {
+        browserName = "Safari";
+        browserVersion = userAgent.match(/version\/(\d+(\.\d+)?)/i)?.[1] || "Unknown";
+      } 
+      // Edge
+      else if (userAgent.match(/edg/i)) {
+        browserName = "Edge";
+        browserVersion = userAgent.match(/edg\/(\d+(\.\d+)?)/i)?.[1] || "Unknown";
+      } 
+      // Chrome
+      else if (userAgent.match(/chrome|chromium/i)) {
+        browserName = "Chrome";
+        browserVersion = userAgent.match(/chrome\/(\d+(\.\d+)?)/i)?.[1] || "Unknown";
+      } 
+      // IE
+      else if (userAgent.match(/msie|trident/i)) {
+        browserName = "IE";
+        browserVersion = userAgent.match(/(?:msie |rv:)(\d+(\.\d+)?)/i)?.[1] || "Unknown";
+      }
+      
+      return { name: browserName, version: browserVersion };
+    };
+
+    // Get browser info
+    const browserInfo = detectBrowser();
+
+    // Create an object to collect all metrics
+    const metrics: MetricsData = {
+      pageURL: window.location.href,
+      pathname: window.location.pathname,
+      pageType: window.location.pathname.includes('/csr') ? 'CSR' : 'SSR',
+      deviceInfo: getDeviceInfo(),
+      timestamp: new Date().toISOString(),
+      browserName: browserInfo.name,
+      browserVersion: browserInfo.version,
+    };
+
+    // Track if metrics have been sent already
+    let metricsSent: boolean = false;
+
+    // Function to send metrics to the API
+    const sendMetrics = () => {
+      if (metricsSent) return;
+      
+      // Check if we have at least some key metrics before sending
+      // Use lcp or lcp_fallback for browsers that don't support LCP
+      if (metrics.ttfb && (metrics.lcp || metrics.lcp_fallback)) {
+        metricsSent = true;
+        
+        fetch('/api/metrics', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(metrics),
+        })
+          .then(response => response.json())
+          .then(data => console.log('Metrics sent successfully:', data))
+          .catch(error => console.error('Error sending metrics:', error));
+      }
+    };
+
+    // Set a fallback timer to ensure metrics are sent
+    const timeoutId = setTimeout(() => {
+      // If we haven't sent metrics yet, send what we have
+      if (!metricsSent) {
+        console.log('Sending metrics via timeout fallback');
+        metrics.incomplete = true;
+        sendMetrics();
+      }
+    }, 30000); // 10 second timeout
+
+    // Function to safely collect metrics with browser compatibility handling
+    const collectMetric = (metricName: string, metricFn: any, onComplete?: () => void) => {
+      try {
+        metricFn(({ value }: { value: number }) => {
+          metrics[metricName] = value;
+          console.log(`${metricName}:`, value);
+          if (onComplete) onComplete();
+        });
+      } catch (error) {
+        console.warn(`Failed to measure ${metricName}:`, error);
+        metrics[`${metricName}_error`] = "Not supported in this browser";
+      }
+    };
+
+    // Handle each web-vital metric with try-catch for browser compatibility
+    
+    collectMetric('ttfb', onTTFB, sendMetrics);
+
+    collectMetric('fcp', onFCP);
+
+    collectMetric('lcp', onLCP, sendMetrics);
+
+    collectMetric('cls', onCLS);
+
+    collectMetric('fid', onFID);
+
+    collectMetric('inp', onINP);
+    
+    if (!('PerformanceObserver' in window) || 
+        !PerformanceObserver.supportedEntryTypes || 
+        !PerformanceObserver.supportedEntryTypes.includes('largest-contentful-paint')) {
+      console.log('LCP not supported, using load event as fallback');
+      
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const navigationEntries = performance.getEntriesByType('navigation');
+          if (navigationEntries.length > 0) {
+            const navEntry = navigationEntries[0] as PerformanceNavigationTiming;
+            metrics.lcp_fallback = navEntry.loadEventEnd;
+            metrics.load = navEntry.loadEventEnd;
+            console.log('Load event fallback:', navEntry.loadEventEnd);
+            sendMetrics();
+          }
+        }, 1000); // Wait a bit after load to ensure timing is complete
+      });
+    }
+
+    // Clean up on unmount
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  // This component doesn't render anything
+  return null;
+}
