@@ -46,7 +46,7 @@ interface MetricsData {
   cls_error?: string;
   fid_error?: string;
   inp_error?: string;
-  [key: string]: any; 
+  [key: string]: string | number | boolean | DeviceInfo | undefined;
 }
 
 export default function MetricsScript() {
@@ -173,9 +173,11 @@ export default function MetricsScript() {
     }, 30000); // 10 second timeout
 
     // Function to safely collect metrics with browser compatibility handling
-    const collectMetric = (metricName: string, metricFn: any, onComplete?: () => void) => {
+    const collectMetric = (metricName: string, 
+      metricFn: (onReport: (metric: { value: number }) => void) => void, 
+      onComplete?: () => void) => {
       try {
-        metricFn(({ value }: { value: number }) => {
+        metricFn(({ value }) => {
           metrics[metricName] = value;
           console.log(`${metricName}:`, value);
           if (onComplete) onComplete();
