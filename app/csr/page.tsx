@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { getAlbums } from '../components/getAlbums';
-import ClientAlbumCard from '../components/ClientAlbumCard';
 import AlbumCard from '../components/AlbumCard';
 import { Album } from '../components/AlbumInterface';
 
