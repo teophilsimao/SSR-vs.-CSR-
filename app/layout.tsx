@@ -1,6 +1,4 @@
 import "./globals.css";
-import MetricsScript from "./components/MetricsScript";
-
 
 export const metadata = {
   title: 'SSR vs CSR Metrics',
@@ -16,7 +14,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
-        <MetricsScript />
       </body>
     </html>
   )

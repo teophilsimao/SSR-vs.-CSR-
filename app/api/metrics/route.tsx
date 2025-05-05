@@ -77,7 +77,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to save metrics' },
       { status: 500, headers: corsHeaders }
     );
-  } finally {
-    await client.close();
   }
 }

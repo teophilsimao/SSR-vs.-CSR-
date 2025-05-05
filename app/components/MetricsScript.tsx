@@ -5,7 +5,7 @@ import { onCLS, onFCP, onFID, onINP, onLCP, onTTFB } from 'web-vitals';
 
 interface NavigatorConnection extends Navigator {
   connection?: {
-    effectiveType: string;
+    effectiveType?: string;
     downlink?: number;
     rtt?: number;
     saveData?: boolean;
@@ -36,51 +36,26 @@ interface MetricsData {
   inp?: number;
   load?: number;
   incomplete?: boolean;
-  ttfb_error?: string;
-  lcp_error?: string;
-  fcp_error?: string;
-  cls_error?: string;
-  fid_error?: string;
-  inp_error?: string;
-  [key: string]: string | number | boolean | DeviceInfo | undefined;
+  [key: string]: any;
 }
 
 export default function MetricsScript() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Add click event listeners to force full page reloads
-    const setupLinkHandlers = () => {
-      document.querySelectorAll('a').forEach(link => {
-        if (link.hostname === window.location.hostname) {
-          link.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = link.href;
-          });
-        }
-      });
-    };
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupLinkHandlers);
-    } else {
-      setupLinkHandlers();
-    }
-
-    // Function to collect device information
     const getDeviceInfo = (): DeviceInfo => {
       const navigatorWithConnection = navigator as NavigatorConnection;
+      const connection = navigatorWithConnection.connection;
       return {
         userAgent: navigator.userAgent,
         screenWidth: window.screen.width,
         screenHeight: window.screen.height,
         devicePixelRatio: window.devicePixelRatio,
-        connectionType: navigatorWithConnection.connection?.effectiveType || 'unknown',
+        connectionType: typeof connection?.effectiveType === 'string' ? connection.effectiveType : 'unknown',
         language: navigator.language,
       };
     };
 
-    // Create an object to collect all metrics
     const metrics: MetricsData = {
       pageURL: window.location.href,
       pathname: window.location.pathname,
@@ -89,144 +64,114 @@ export default function MetricsScript() {
       timestamp: new Date().toISOString(),
     };
 
-    // Track if metrics have been sent already
-    let metricsSent: boolean = false;
+    let metricsSent = false;
 
-    // Function to get the API base URL dynamically
     const getApiBaseUrl = (): string => {
       return process.env.NODE_ENV === 'development'
         ? window.location.origin
         : process.env.NEXT_PUBLIC_API_BASE_URL || window.location.origin;
     };
 
-    // Function to send metrics to the API with retry logic and sendBeacon fallback
-    const sendMetrics = async (retryCount: number = 0, maxRetries: number = 2) => {
-      if (metricsSent) return;
+    const sendMetrics = async (retryCount = 0, maxRetries = 2) => {
+      if (metricsSent || !navigator.onLine) return;
 
-      // Check network availability
-      if (!navigator.onLine) {
-        console.warn('Device is offline, cannot send metrics');
-        return;
-      }
-
-      // Ensure required metrics are available
-      if (!(metrics.ttfb && (metrics.lcp || metrics.lcp_fallback))) {
-        return;
-      }
+      if (!(metrics.ttfb && (metrics.lcp || metrics.lcp_fallback))) return;
 
       metricsSent = true;
       const apiUrl = `${getApiBaseUrl()}/api/metrics`;
       const blob = new Blob([JSON.stringify(metrics)], { type: 'application/json' });
 
-      console.log('Sending metrics to:', apiUrl);
-      console.log('Metrics payload:', metrics);
-
       try {
-        // Try fetch first
-        const response = await fetch(apiUrl, {
+        const res = await fetch(apiUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(metrics),
-          credentials: 'same-origin',
-          cache: 'no-store',
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log('Metrics sent successfully:', data);
-      } catch (error) {
-        console.error('Fetch error:', error);
-
-        // Fallback to sendBeacon
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        console.log('✅ Metrics sent:', await res.json());
+      } catch (err) {
+        console.warn('❌ Fetch error, trying sendBeacon...');
         try {
-          const beaconSent = navigator.sendBeacon(apiUrl, blob);
-          if (beaconSent) {
-            console.log('Metrics sent successfully via sendBeacon');
-          } else {
-            throw new Error('sendBeacon failed');
-          }
-        } catch (beaconError) {
-          console.error('sendBeacon error:', beaconError);
-
-          // Retry logic
+          if (!navigator.sendBeacon(apiUrl, blob)) throw new Error('sendBeacon failed');
+          console.log('✅ Metrics sent via sendBeacon');
+        } catch {
           if (retryCount < maxRetries) {
-            console.log(`Retrying metrics send (attempt ${retryCount + 1}/${maxRetries})...`);
             metricsSent = false;
-            setTimeout(() => sendMetrics(retryCount + 1, maxRetries), 1000 * (retryCount + 1));
+            setTimeout(() => sendMetrics(retryCount + 1), 1000 * (retryCount + 1));
           } else {
-            console.error('Max retries reached, failed to send metrics');
             metrics.incomplete = true;
+            console.error('❌ Failed after retries');
           }
         }
       }
     };
 
-    // Set a fallback timer to ensure metrics are sent
+    const collectMetric = (
+      key: keyof MetricsData,
+      fn: (cb: (metric: { value: number }) => void) => void,
+      onReady?: () => void
+    ) => {
+      try {
+        fn(({ value }) => {
+          metrics[key] = value;
+          if (onReady) onReady();
+        });
+      } catch {
+        metrics[`${key}_error`] = 'not supported';
+      }
+    };
+
+    // Collect supported metrics
+    if (performance.getEntriesByType('navigation').length > 0) {
+      collectMetric('ttfb', onTTFB, sendMetrics);
+    }
+
+    collectMetric('fcp', onFCP);
+    collectMetric('cls', onCLS);
+    collectMetric('fid', onFID);
+    collectMetric('inp', onINP);
+
+    // Check for LCP support
+    const supportsLCP = typeof PerformanceObserver !== 'undefined' &&
+      PerformanceObserver.supportedEntryTypes?.includes('largest-contentful-paint');
+
+    if (supportsLCP) {
+      collectMetric('lcp', onLCP, sendMetrics);
+    } else {
+      // Fallback for LCP (Firefox/Safari)
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+          if (nav) {
+            metrics.lcp_fallback = nav.loadEventEnd;
+            metrics.load = nav.loadEventEnd;
+            sendMetrics();
+          }
+        }, 1000);
+      });
+
+      // Also fallback if LCP wasn't reported after 5s
+      setTimeout(() => {
+        if (!metrics.lcp && !metrics.lcp_fallback) {
+          const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+          if (nav) {
+            metrics.lcp_fallback = nav.loadEventEnd;
+            sendMetrics();
+          }
+        }
+      }, 5000);
+    }
+
+    // Fallback to ensure sending metrics even if nothing fires
     const timeoutId = setTimeout(() => {
       if (!metricsSent) {
-        console.log('Sending metrics via timeout fallback');
         metrics.incomplete = true;
         sendMetrics();
       }
     }, 30000);
 
-    // Function to safely collect metrics with browser compatibility handling
-    const collectMetric = (
-      metricName: string,
-      metricFn: (onReport: (metric: { value: number }) => void) => void,
-      onComplete?: () => void
-    ) => {
-      try {
-        metricFn(({ value }) => {
-          metrics[metricName] = value;
-          console.log(`${metricName}:`, value);
-          if (onComplete) onComplete();
-        });
-      } catch (error) {
-        console.warn(`Failed to measure ${metricName}:`, error);
-        metrics[`${metricName}_error`] = 'Not supported in this browser';
-      }
-    };
-
-    // Handle each web-vital metric
-    collectMetric('ttfb', onTTFB, () => sendMetrics());
-    collectMetric('fcp', onFCP);
-    collectMetric('lcp', onLCP, () => sendMetrics());
-    collectMetric('cls', onCLS);
-    collectMetric('fid', onFID);
-    collectMetric('inp', onINP);
-
-    // Fallback for browsers that don't support LCP
-    if (
-      !('PerformanceObserver' in window) ||
-      !PerformanceObserver.supportedEntryTypes ||
-      !PerformanceObserver.supportedEntryTypes.includes('largest-contentful-paint')
-    ) {
-      console.log('LCP not supported, using load event as fallback');
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          const navigationEntries = performance.getEntriesByType('navigation');
-          if (navigationEntries.length > 0) {
-            const navEntry = navigationEntries[0] as PerformanceNavigationTiming;
-            metrics.lcp_fallback = navEntry.loadEventEnd;
-            metrics.load = navEntry.loadEventEnd;
-            console.log('Load event fallback:', navEntry.loadEventEnd);
-            sendMetrics();
-          }
-        }, 1000);
-      });
-    }
-
-    // Clean up on unmount
-    return () => {
-      clearTimeout(timeoutId);
-    };
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return null;
