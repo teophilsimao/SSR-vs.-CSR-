@@ -36,7 +36,7 @@ interface MetricsData {
   inp?: number;
   load?: number;
   incomplete?: boolean;
-  [key: string]: any;
+  [key: string]: string | number | boolean | DeviceInfo | undefined;
 }
 
 export default function MetricsScript() {
@@ -101,7 +101,7 @@ export default function MetricsScript() {
             setTimeout(() => sendMetrics(retryCount + 1), 1000 * (retryCount + 1));
           } else {
             metrics.incomplete = true;
-            console.error('❌ Failed after retries');
+            console.error('❌ Failed after retries', err);
           }
         }
       }
