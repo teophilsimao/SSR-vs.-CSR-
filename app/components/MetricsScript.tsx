@@ -72,14 +72,17 @@ export default function MetricsScript() {
         : process.env.NEXT_PUBLIC_API_BASE_URL || window.location.origin;
     };
 
-    const sendMetrics = async (retryCount = 0, maxRetries = 2) => {
+    const sendMetrics = async (forceIncomplete = false) => {
       if (metricsSent || !navigator.onLine) return;
 
-      if (!(metrics.ttfb && (metrics.lcp || metrics.lcp_fallback))) return;
+      // Check if we have essential metrics or if we're forcing incomplete data
+      if (!metrics.ttfb || !metrics.lcp) {
+        if (!forceIncomplete) return;
+        metrics.incomplete = true;
+      }
 
       metricsSent = true;
       const apiUrl = `${getApiBaseUrl()}/api/metrics`;
-      const blob = new Blob([JSON.stringify(metrics)], { type: 'application/json' });
 
       try {
         const res = await fetch(apiUrl, {
@@ -89,89 +92,89 @@ export default function MetricsScript() {
         });
 
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        console.log('✅ Metrics sent:', await res.json());
+        console.log('Metrics sent:', await res.json());
       } catch (err) {
-        console.warn('❌ Fetch error, trying sendBeacon...');
-        try {
-          if (!navigator.sendBeacon(apiUrl, blob)) throw new Error('sendBeacon failed');
-          console.log('✅ Metrics sent via sendBeacon');
-        } catch {
-          if (retryCount < maxRetries) {
-            metricsSent = false;
-            setTimeout(() => sendMetrics(retryCount + 1), 1000 * (retryCount + 1));
-          } else {
-            metrics.incomplete = true;
-            console.error('❌ Failed after retries', err);
-          }
-        }
+        console.error('Failed to send metrics', err);
       }
     };
 
-    const collectMetric = (
-      key: keyof MetricsData,
-      fn: (cb: (metric: { value: number }) => void) => void,
-      onReady?: () => void
-    ) => {
-      try {
-        fn(({ value }) => {
-          metrics[key] = value;
-          if (onReady) onReady();
-        });
-      } catch {
-        metrics[`${key}_error`] = 'not supported';
+    onTTFB(({ value }) => {
+      metrics.ttfb = value;
+    });
+
+    onFCP(({ value }) => {
+      metrics.fcp = value;
+    });
+
+    onLCP(({ value }) => {
+      metrics.lcp = value;
+    });
+
+    onCLS(({ value }) => {
+      metrics.cls = value;
+    });
+
+    onFID(({ value }) => {
+      metrics.fid = value;
+    });
+
+    // Key change: create an explicit callback for INP
+    let inpReported = false;
+    onINP(({ value }) => {
+      metrics.inp = value;
+      inpReported = true;
+      console.log('INP reported:', value);
+      
+      // Try to send metrics when INP becomes available 
+      // (if interaction has already happened)
+      if (interactionOccurred) {
+        setTimeout(() => sendMetrics(), 1000);
       }
-    };
+    });
 
-    // Collect supported metrics
-    if (performance.getEntriesByType('navigation').length > 0) {
-      collectMetric('ttfb', onTTFB, sendMetrics);
-    }
-
-    collectMetric('fcp', onFCP);
-    collectMetric('cls', onCLS);
-    collectMetric('fid', onFID);
-    collectMetric('inp', onINP);
-
-    // Check for LCP support
-    const supportsLCP = typeof PerformanceObserver !== 'undefined' &&
-      PerformanceObserver.supportedEntryTypes?.includes('largest-contentful-paint');
-
-    if (supportsLCP) {
-      collectMetric('lcp', onLCP, sendMetrics);
-    } else {
-      // Fallback for LCP (Firefox/Safari)
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-          if (nav) {
-            metrics.lcp_fallback = nav.loadEventEnd;
-            metrics.load = nav.loadEventEnd;
-            sendMetrics();
-          }
-        }, 1000);
-      });
-
-      // Also fallback if LCP wasn't reported after 5s
+    let interactionOccurred = false;
+    // Listen for any click in the document, not just once
+    const clickHandler = () => {
+      interactionOccurred = true;
+      console.log('Interaction detected, waiting for INP calculation...');
+      
+      // First attempt after a reasonable delay
       setTimeout(() => {
-        if (!metrics.lcp && !metrics.lcp_fallback) {
-          const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-          if (nav) {
-            metrics.lcp_fallback = nav.loadEventEnd;
-            sendMetrics();
-          }
+        if (inpReported) {
+          console.log('INP available after interaction:', metrics.inp);
+          sendMetrics();
+        } else {
+          console.log('INP not yet available, waiting longer...');
+          
+          // Second attempt with longer delay
+          setTimeout(() => {
+            if (inpReported) {
+              console.log('INP now available:', metrics.inp);
+              sendMetrics();
+            } else {
+              console.log('INP still not available, sending incomplete metrics');
+              // Force send even if INP isn't available
+              sendMetrics(true);
+            }
+          }, 5000); // Wait 5 more seconds
         }
-      }, 5000);
-    }
+      }, 5000); // Initial 5 second wait after interaction
+    };
 
-    // Fallback to ensure sending metrics even if nothing fires
-    const timeoutId = setTimeout(() => {
+    document.addEventListener('click', clickHandler);
+    
+    // Fallback to ensure metrics get sent even if there's no interaction
+    const fallbackTimeout = setTimeout(() => {
       if (!metricsSent) {
-        metrics.incomplete = true;
-        sendMetrics();
+        console.log('Fallback: No interaction detected, sending available metrics');
+        sendMetrics(true);
       }
-    }, 30000);
+    }, 30000); // 30 seconds fallback
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      document.removeEventListener('click', clickHandler);
+      clearTimeout(fallbackTimeout);
+    };
   }, []);
 
   return null;

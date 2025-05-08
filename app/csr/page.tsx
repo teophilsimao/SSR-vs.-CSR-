@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { getAlbums } from '../components/getAlbums';
 import AlbumCard from '../components/AlbumCard';
 import { Album } from '../components/AlbumInterface';
-import MetricsScript from '../components/MetricsScript';
+import InteractionButton from '../components/InteractionButton';
 import Head from 'next/head';
 
 const CSRpage = () => {
@@ -39,7 +39,7 @@ const CSRpage = () => {
         />
         <meta property="og:image" content="/placeholder-album.jpg" />
       </Head>
-      <MetricsScript />
+      <InteractionButton />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         {albums.map((album: Album) => (
           <AlbumCard key={album.id} album={album}/>
